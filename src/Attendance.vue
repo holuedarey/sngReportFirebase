@@ -19,8 +19,7 @@
           <el-table :data="attendance" style="width: 100%;">
             <!-- {{ scope.row.id }} -->
             <el-table-column label="#" type="index" width="50"> </el-table-column>
-            <el-table-column label="First Name" prop="firstname"> </el-table-column>
-            <el-table-column label="Last Name" prop="lastname"> </el-table-column>
+            <el-table-column label="Name" prop="name"> </el-table-column>
             <el-table-column label="Site Name" prop="site_name"> </el-table-column>
             <el-table-column label="Clocking Purpose" prop="clocking_purpose"> </el-table-column>
             <el-table-column label="Clocking Date Time" prop="clocking_date_time"> </el-table-column>
@@ -97,8 +96,7 @@
           const userResp =  user.docs.map(d =>d.data())[0];
 
           data['clocking_date_time'] = this.formatDate(data.clocking_date_time.seconds);
-          data['firstname'] = userResp.firstname;
-          data['lastname'] = userResp.lastname;
+          data['name'] = `${userResp.firstname} ${userResp.lastname}`;
           data['clockingPurpose'] = data.clocking_purpose;
           delete data['user_id'];
           return data;
