@@ -12,7 +12,7 @@
               </el-date-picker>
             </el-col>
             <el-col :span="5" :offset="7">
-              <el-button round type="primary" @click="downloadData()" >Download</el-button>
+              <el-button round type="primary" @click="downloadData()">Download</el-button>
             </el-col>
           </el-row>
           <hr>
@@ -41,7 +41,8 @@
   const db = firebase.firestore();
   import InfiniteLoading from 'vue-infinite-loading'
   import moment from 'moment';
-  import { ExportToCsv } from 'export-to-csv';
+  // import { ExportToCsv } from 'export-to-csv';
+  import * as ExcelJS from "exceljs";
   const pageSize = 50;
 
   export default {
@@ -59,7 +60,7 @@
         search: null,
         latDocSnapshot: null,
         value2: '',
-        startDate:  "",
+        startDate: "",
       };
     },
     firestore: {
@@ -89,11 +90,11 @@
         }
         const attendanceSnap = await attendanceRef.get();
         this.latDocSnapshot = attendanceSnap.docs[attendanceSnap.docs.length - 1]
-        let  result = attendanceSnap.docs.map(async (u) => {
+        let result = attendanceSnap.docs.map(async (u) => {
           const data = u.data();
           // console.log("issues:", data.user_id)
           const user = await db.collection("users").where('uid', '==', data.user_id).get();
-          const userResp =  user.docs.map(d =>d.data())[0];
+          const userResp = user.docs.map(d => d.data())[0];
 
           data['clocking_date_time'] = this.formatDate(data.clocking_date_time.seconds);
           data['name'] = `${userResp.firstname} ${userResp.lastname}`;
@@ -105,7 +106,7 @@
         if (date) {
           console.log("git here", result.length)
           this.attendance = result;
-        }else{
+        } else {
           this.attendance.push(...result);
         }
         return result.length;
@@ -141,7 +142,7 @@
           const data = u.data();
           // console.log("issues:", data.user_id)
           const user = await db.collection("users").where('uid', '==', data.user_id).get();
-          const userResp =  user.docs.map(d =>d.data())[0];
+          const userResp = user.docs.map(d => d.data())[0];
 
           data['clocking_date_time'] = this.formatDate(data.clocking_date_time.seconds);
           data['firstname'] = userResp.firstname;
@@ -150,33 +151,69 @@
           return data;
         });
 
-       let csvData =  await Promise.all(result);
-       
-       csvData = csvData.map(el => {
-        return {
-          "FirstName": el.firstname, 
-          "LastName":el.lastname,
-          "SiteName":el.site_name,
-          "ClockingPurpose":el.clocking_purpose,
-          "ClockingDateTime":el.clocking_date_time
-        }
-       });
-       console.log("result", csvData.length)
-        const options = {
-          fieldSeparator: ',',
-          quoteStrings: '"',
-          decimalSeparator: '.',
-          showLabels: true,
-          showTitle: true,
-          filename: `Attendance for ${queryDateStart}`,
-          title: `Attendance for ${queryDateStart}`,
-          useBom: true,
-          // useKeysAsHeaders: true,
-          headers: ["First Name", "Last Name", "Site Name", "Clocking Purpose", "Clocking Date Time"]
-        };
+        let csvData = await Promise.all(result);
 
-        const csvExporter = new ExportToCsv(options);
-        csvExporter.generateCsv(csvData);
+        csvData = csvData.map(el => {
+          return {
+            "FirstName": el.firstname,
+            "LastName": el.lastname,
+            "SiteName": el.site_name,
+            "ClockingPurpose": el.clocking_purpose,
+            "ClockingDateTime": el.clocking_date_time
+          }
+        });
+        console.log("result", csvData.length)
+        // const options = {
+        //   fieldSeparator: ',',
+        //   quoteStrings: '"',
+        //   decimalSeparator: '.',
+        //   showLabels: true,
+        //   showTitle: true,
+        //   filename: `Attendance for ${queryDateStart}`,
+        //   title: `Attendance for ${queryDateStart}`,
+        //   useBom: true,
+        //   // useKeysAsHeaders: true,
+        //   headers: ["First Name", "Last Name", "Site Name", "Clocking Purpose", "Clocking Date Time"]
+        // };
+
+        const workbook = new ExcelJS.Workbook();
+        workbook.creator = 'Sng Reports';
+        workbook.created = new Date();
+
+        const worksheet = workbook.addWorksheet('Attendance');
+// 
+        // worksheet.columns = Object.keys(csvData[0] || {}).map(col => ({ key: col, width: 24, height: 10 }));
+        worksheet.getRow(1).values = ["First Name", "Last Name", "Site Name", "Clocking Purpose", "Clocking Date Time"];
+        worksheet.getRow(1).height = 85;
+        worksheet.getRow(1).alignment = { vertical: 'middle' };
+        // worksheet.getRow(1).eachCell((cell) => {
+        //   cell.fill = {
+        //     type: 'pattern',
+        //     pattern: 'darkTrellis',
+        //     fgColor: { argb: '000000' },
+        //     bgColor: { argb: '000000' },
+        //   };
+        //   cell.border = {
+        //     top: { style: 'thick' },
+        //     left: { style: 'thick' },
+        //     bottom: { style: 'thick' },
+        //     right: { style: 'thick' },
+        //   };
+        //   cell.font = {
+        //     color: { argb: 'ffffff' },
+        //     bold: true,
+        //     name: 'Calibri',
+        //   };
+        // });
+
+        worksheet.addRows(csvData);
+        // worksheet.eachRow((row) => { (row.font || {}).name = 'Calibri'; });
+       workbook.xlsx.writeBuffer(`Attendance_for_`).then(data => console.log("data", data));
+
+        return `files/Attendance_for_${queryDateStart}`;
+
+        // const csvExporter = new ExportToCsv(options);
+        // csvExporter.generateCsv(csvData);
       },
 
 
