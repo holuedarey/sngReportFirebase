@@ -16,6 +16,9 @@
           <el-menu-item>
             <router-link to="/users">Users</router-link>
           </el-menu-item>
+          <el-menu-item>
+            <router-link to="/location">Location</router-link>
+          </el-menu-item>
         </el-menu>
       </el-col>
     </el-header>

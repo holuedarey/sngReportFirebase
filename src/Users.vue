@@ -35,10 +35,10 @@
 </template>
 
 <script>
-  import firebase from "./firebaseInit";
+  // import firebase from "./firebaseInit";
   import InfiniteLoading from 'vue-infinite-loading'
-  const db = firebase.firestore();
-  const pageSize = 50;
+  // const db = firebase.firestore();
+  // const pageSize = 50;
   // const field = 'firstname';
   // console.log("data log", lastVisible)
   export default {
@@ -66,16 +66,17 @@
 
       async fetchUsers() {
 
-        let userRef = db.collection("users").limit(pageSize);
-        if (this.latDocSnapshot) {
-          userRef =  userRef.startAfter(this.latDocSnapshot);
-        }
-        const userSnap = await userRef.get();
-        this.latDocSnapshot = userSnap.docs[userSnap.docs.length - 1]
-        const result = userSnap.docs.map(u => u.data());
-        this.userData.push(...result);
-        console.log(this.userData)
-        return result.length;
+   
+        // let userRef = db.collection("users").limit(pageSize);
+        // if (this.latDocSnapshot) {
+        //   userRef =  userRef.startAfter(this.latDocSnapshot);
+        // }
+        // const userSnap = await userRef.get();
+        // this.latDocSnapshot = userSnap.docs[userSnap.docs.length - 1]
+        // const result = userSnap.docs.map(u => u.data());
+        // this.userData.push(...result);
+        // console.log(this.userData)
+        // return result.length;
       },
       async infiniteHandler($state){
         const newUserCount = await this.fetchUsers();
