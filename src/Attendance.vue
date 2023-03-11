@@ -133,7 +133,7 @@
         this.startDate = val[0];
         this.endDate = val[1];
 
-        await this.fetchAttendances(val[0], val[1])
+        await this.fetchAttendances(val[0], val[1], this.search, this.page, pageSize);
       },
       '$route.query.page': {
         immediate: true,
@@ -211,7 +211,7 @@
     methods: {
 
       async fetchAttendances(start = null, end = null, search = null, page = 1, pageSize) {
-        // console.log(date)
+        console.log(start, end)
         let queryDateStart = moment().startOf('day').format('YYYY-MM-DD');
         let queryDateEnd = moment().endOf('day').format('YYYY-MM-DD');
 
