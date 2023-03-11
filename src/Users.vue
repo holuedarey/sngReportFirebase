@@ -18,7 +18,6 @@
               <el-table-column label="Last Name" prop="lastname"> </el-table-column>
 
               <el-table-column label="Email" prop="email"> </el-table-column>
-              <el-table-column abel="User Id" prop="uid"> </el-table-column>
               <el-table-column align="right">
                 <template slot="header">
                   <el-input v-model="search" size="mini" placeholder="Type to search" />

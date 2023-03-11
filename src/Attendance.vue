@@ -7,15 +7,29 @@
         <div>
           <h1>Attendance</h1>
           <el-row>
-            <el-col :span="12">
-              <el-date-picker v-model="value2" type="date" placeholder="Pick a date" default-value="">
-              </el-date-picker>
+            <el-col :span="18">
+              <!-- <el-date-picker v-model="value2" type="date" placeholder="Pick a date" default-value="">
+              </el-date-picker> -->
+              <el-row>
+                <el-col :span="12">
+                  <el-date-picker v-model="value1" type="daterange" range-separator="To" start-placeholder="Start date"
+                    end-placeholder="End date" :picker-options="pickerOptions">
+                  </el-date-picker>
+                </el-col>
+                <el-col :span="12">
+                  <el-form ref="form" :model="form" label-width="">
+                    <el-input v-model="search" placeholder="search with name"></el-input>
+                  </el-form>
+                </el-col>
+              </el-row>
+
             </el-col>
-            <el-col :span="5" :offset="7">
+            <el-col :span="5" :offset="0">
               <el-button round type="primary" @click="downloadData()">Download</el-button>
             </el-col>
           </el-row>
           <hr>
+          <el-skeleton v-if="!attendance.length" />
           <el-table :data="attendance" style="width: 100%;">
             <!-- {{ scope.row.id }} -->
             <el-table-column label="#" type="index" width="50"> </el-table-column>
@@ -29,67 +43,194 @@
               </template>
             </el-table-column> -->
           </el-table>
-          <InfiniteLoading @infinite="infiniteHandler"></InfiniteLoading>
+          <!-- <InfiniteLoading @infinite="infiniteHandler"></InfiniteLoading> -->
+
+          <el-row>
+            <div class="pagination" v-if="attendance.length">
+              <el-row>
+                <el-col :span="6">
+                  <span  v-if="page != totalPage">
+                    <router-link :to="{ query: { page: 1 }}" class="page-link">First</router-link>
+                  </span>
+                </el-col>
+                <el-col :span="6" :offset="6">
+                  <span v-if="page !== 1">
+                    <router-link :to="{ query: { page: page - 1 }}" class="page-link">Previous</router-link>
+                  </span>
+                  <span v-if="totalPage > page">
+                    <router-link :to="{ query: { page: page + 1 }}" class="page-link">Next</router-link>
+                  </span>
+                </el-col>
+                <el-col :span="2" :offset="4">
+                  <span  v-if="page != totalPage">
+                    <router-link :to="{ query: { page: totalPage }}" class="page-link">Last</router-link>
+                  </span>
+                </el-col>
+              </el-row>
+
+
+
+            </div>
+          </el-row>
+
+
         </div>
       </el-col>
     </el-row>
   </el-main>
 </template>
+<style>
+  .pagination {
+    display: inline-block;
+  }
+
+  .pagination a {
+    color: black;
+    float: left;
+    padding: 8px 16px;
+    text-decoration: none;
+    border: 1px solid #efefef;
+    box-shadow: 0px 0px 4px rgba(110,110,110,0.6); 
+    padding: 10px;
+    margin: 20px; 
+    width: 100px;
+    text-align: center;
+  }
+</style>
 
 <script>
-  import InfiniteLoading from 'vue-infinite-loading'
+  // import InfiniteLoading from 'vue-infinite-loading'
   import moment from 'moment';
   import axios from 'axios';
   // import { ExportToCsv } from 'export-to-csv';
   // import * as ExcelJS from "exceljs";
-  // const pageSize = 50;
+  const pageSize = 50;
   // const baseUrl = 'https://sngapp.herokuapp.com/api/v1/';
   const config = {
     headers: {
       authorization: 'Bearer j38yo87hyedb67y8ypgedt6798390u87gsghsa989d7go8d',
     }
   };
+
+  const customStyles = {
+
+    ul: {
+      border: '2px solid red',
+      display: "inline-block"
+    },
+    li: {
+      display: 'inline !important',
+      border: '2px dotted green'
+    },
+    a: {
+      color: 'blue'
+    }
+  };
   export default {
     name: "app",
     watch: {
-      value2: async function (val) {
-        await this.fetchAttendances(val)
-        this.startDate = val;
-      }
+      value1: async function (val) {
+        this.startDate = val[0];
+        this.endDate = val[1];
+
+        await this.fetchAttendances(val[0], val[1])
+      },
+      '$route.query.page': {
+        immediate: true,
+        async handler(page) {
+          page = parseInt(page) || 1;
+          this.page = page;
+          const totalPage = Math.ceil(this.pager / pageSize);
+          this.totalPage = totalPage;
+          console.log("page", page, 'totalPage', totalPage, this.pager);
+          if (totalPage >= page) {
+            await this.fetchAttendances(this.startDate, this.endDate, this.search, page, pageSize)
+          }
+        }
+      },
+      search: async function (val) {
+        const search = val || "";
+        console.log(search)
+        await this.fetchAttendances(this.startDate, this.endDate, search, 1, pageSize)
+      },
+
     },
     data() {
       return {
+        pager: null,
+        customStyles,
+        pickerOptions: {
+          disabledDate(time) {
+            return time.getTime() > Date.now();
+          },
+          shortcuts: [{
+            text: 'Last week',
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+              picker.$emit('pick', [start, end]);
+            }
+          }, {
+            text: 'Last month',
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+              picker.$emit('pick', [start, end]);
+            }
+          }, {
+            text: 'Last 3 months',
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+              picker.$emit('pick', [start, end]);
+            }
+          }]
+        },
         name: "",
         attendance: [],
         search: null,
+        form: {},
         latDocSnapshot: null,
-        value2: '',
+        value1: '',
         startDate: "",
+        endDate: "",
+        page: 1,
+        totalPage: null
       };
     },
-    components: {
-      InfiniteLoading
+    mounted() {
+      this.page = 1;
+      this.fetchAttendances(this.startDate, this.endDate, this.search, this.page, pageSize);
     },
+    // components: {
+    //   InfiniteLoading
+    // },
     methods: {
 
-      async fetchAttendances(date = null) {
-        console.log(date)
+      async fetchAttendances(start = null, end = null, search = null, page = 1, pageSize) {
+        // console.log(date)
         let queryDateStart = moment().startOf('day').format('YYYY-MM-DD');
         let queryDateEnd = moment().endOf('day').format('YYYY-MM-DD');
 
-        if (date) {
-          queryDateStart = moment(new Date(date))
-          .startOf('day').format('YYYY-MM-DD');
-          queryDateEnd = moment(new Date(date)).endOf('day').format('YYYY-MM-DD');
+        if (start) {
+          queryDateStart = moment(new Date(start))
+            .startOf('day').format('YYYY-MM-DD');
+          queryDateEnd = moment(new Date(end || start)).endOf('day').format('YYYY-MM-DD');
         }
+        console.log(queryDateStart, queryDateEnd)
         try {
-          const attendance = await axios.get(`clocking?startdate=${queryDateStart}&enddate=${queryDateEnd}`, config);
+          const attendance = await axios.get(`clocking?startdate=${queryDateStart}&enddate=${queryDateEnd}&page=${page}&limit=${pageSize}&search=${search}`, config);
           this.attendance = attendance.data.data;
-          this.attendance = this.attendance.map(el => {
+          this.pager = this.attendance['total'];
+          this.totalPage = Math.ceil(this.pager / pageSize);
+          this.attendance = this.attendance['row'].map(el => {
             el['name'] = `${el.user.firstname} ${el.user.lastname}`;
             return el;
           });
-          console.log("data to display : ", this.attendance)
+          console.log("data to display : ", this.pager)
         } catch (error) {
           this.attendance = []
           console.log(error.message)
