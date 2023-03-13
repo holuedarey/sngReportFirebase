@@ -90,14 +90,14 @@
     methods: {
 
       async fetchUsers(start = null, end = null) {
-        let queryDateStart = moment().startOf('day').format('YYYY-MM-DD');
-        let queryDateEnd = moment().endOf('day').format('YYYY-MM-DD');
+        // let queryDateStart = moment().startOf('day').format('YYYY-MM-DD');
+        // let queryDateEnd = moment().endOf('day').format('YYYY-MM-DD');
 
-        if (start) {
-          queryDateStart = moment(new Date(start))
-            .startOf('day').format('YYYY-MM-DD');
-          queryDateEnd = moment(new Date(end || start)).endOf('day').format('YYYY-MM-DD');
-        }
+        // if (start) {
+        //   queryDateStart = moment(new Date(start))
+        //     .startOf('day').format('YYYY-MM-DD');
+        //   queryDateEnd = moment(new Date(end || start)).endOf('day').format('YYYY-MM-DD');
+        // }
         try {
           const config = {
             headers: {
