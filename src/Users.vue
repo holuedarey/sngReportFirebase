@@ -34,12 +34,10 @@
 </template>
 
 <script>
-  // import firebase from "./firebaseInit";
   import InfiniteLoading from 'vue-infinite-loading'
-  // const db = firebase.firestore();
-  // const pageSize = 50;
-  // const field = 'firstname';
-  // console.log("data log", lastVisible)
+  import moment from 'moment';
+  import axios from 'axios';
+  const pageSize = 50;
   export default {
     name: "app",
     data() {
@@ -48,38 +46,76 @@
         userData: [],
         latDocSnapshot: null,
         search: null,
+        totalPage: null,
+        pager: null,
+        page: 1,
+        startDate: null, 
+        endDate: null
       };
     },
 
     components: {
       InfiniteLoading
     },
-    firestore: {
-      // userData: db.collection("users").orderBy('firstname').limit(pageSize),
-      // userData: this.fetchUsers()
+    watch: {
+      value1: async function (val) {
+        this.startDate = val[0];
+        this.endDate = val[1];
+
+        await this.fetchAttendances(val[0], val[1], this.search, this.page, pageSize);
+      },
+      '$route.query.page': {
+        immediate: true,
+        async handler(page) {
+          page = parseInt(page) || 1;
+          this.page = page;
+          const totalPage = Math.ceil(this.pager / pageSize);
+          this.totalPage = totalPage;
+          console.log("page", page, 'totalPage', totalPage, this.pager);
+          if (totalPage >= page) {
+            await this.fetchUsers(this.startDate, this.endDate, this.search, page, pageSize)
+          }
+        }
+      },
+      search: async function (val) {
+        const search = val || "";
+        this.search = val;
+        await this.fetchAttendances(this.startDate, this.endDate, search, 1, pageSize)
+      },
+
     },
     mounted() {
       this.fetchUsers();
     },
     methods: {
 
-      async fetchUsers() {
+      async fetchUsers(start = null, end = null) {
+        let queryDateStart = moment().startOf('day').format('YYYY-MM-DD');
+        let queryDateEnd = moment().endOf('day').format('YYYY-MM-DD');
 
-   
-        // let userRef = db.collection("users").limit(pageSize);
-        // if (this.latDocSnapshot) {
-        //   userRef =  userRef.startAfter(this.latDocSnapshot);
-        // }
-        // const userSnap = await userRef.get();
-        // this.latDocSnapshot = userSnap.docs[userSnap.docs.length - 1]
-        // const result = userSnap.docs.map(u => u.data());
-        // this.userData.push(...result);
-        // console.log(this.userData)
-        // return result.length;
+        if (start) {
+          queryDateStart = moment(new Date(start))
+            .startOf('day').format('YYYY-MM-DD');
+          queryDateEnd = moment(new Date(end || start)).endOf('day').format('YYYY-MM-DD');
+        }
+        try {
+          const config = {
+            headers: {
+              authorization: 'Bearer j38yo87hyedb67y8ypgedt6798390u87gsghsa989d7go8d',
+            }
+          };
+          const users = await axios.get(`users?page=${this.page}&limit=${pageSize}&search=${this.search}`, config);
+          this.userData = users.data.data;
+          // this.pager = this.attendance['total'];
+          // this.totalPage = Math.ceil(this.pager / pageSize);
+        } catch (error) {
+          this.userData = []
+          console.log(error.message)
+        }
       },
-      async infiniteHandler($state){
+      async infiniteHandler($state) {
         const newUserCount = await this.fetchUsers();
-        if(newUserCount > 0){
+        if (newUserCount > 0) {
           return $state.loaded();
         }
         return $state.complete();

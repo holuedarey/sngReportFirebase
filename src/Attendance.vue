@@ -49,7 +49,7 @@
             <div class="pagination" v-if="attendance.length">
               <el-row>
                 <el-col :span="6">
-                  <span  v-if="page != totalPage">
+                  <span v-if="page != totalPage">
                     <router-link :to="{ query: { page: 1 }}" class="page-link">First</router-link>
                   </span>
                 </el-col>
@@ -62,7 +62,7 @@
                   </span>
                 </el-col>
                 <el-col :span="2" :offset="4">
-                  <span  v-if="page != totalPage">
+                  <span v-if="page != totalPage">
                     <router-link :to="{ query: { page: totalPage }}" class="page-link">Last</router-link>
                   </span>
                 </el-col>
@@ -90,9 +90,9 @@
     padding: 8px 16px;
     text-decoration: none;
     border: 1px solid #efefef;
-    box-shadow: 0px 0px 4px rgba(110,110,110,0.6); 
+    box-shadow: 0px 0px 4px rgba(110, 110, 110, 0.6);
     padding: 10px;
-    margin: 20px; 
+    margin: 20px;
     width: 100px;
     text-align: center;
   }
@@ -149,8 +149,8 @@
         }
       },
       search: async function (val) {
-        const search = val || "";
-        console.log(search)
+        const search = val || ""; 
+        this.search = val;
         await this.fetchAttendances(this.startDate, this.endDate, search, 1, pageSize)
       },
 
@@ -235,44 +235,6 @@
           this.attendance = []
           console.log(error.message)
         }
-
-        // let queryDateStart = moment().startOf('day').toDate();
-        // let queryDateEnd = moment().endOf('day').toDate()
-
-        // if (date) {
-        //   queryDateStart = moment(new Date(date)).startOf('day').toDate();
-        //   queryDateEnd = moment(new Date(date)).endOf('day').toDate();
-        // }
-
-        // let attendanceRef = db.collection("attendance")
-        //   .where('clocking_date_time', '>=', queryDateStart)
-        //   .where('clocking_date_time', '<=', queryDateEnd)
-        //   .orderBy("clocking_date_time", "desc")
-        //   .limit(pageSize);
-        // if (this.latDocSnapshot) {
-        //   attendanceRef = attendanceRef.startAfter(this.latDocSnapshot);
-        // }
-        // const attendanceSnap = await attendanceRef.get();
-        // this.latDocSnapshot = attendanceSnap.docs[attendanceSnap.docs.length - 1]
-        // let result = attendanceSnap.docs.map(async (u) => {
-        //   const data = u.data();
-        //   // console.log("issues:", data.user_id)
-        //   const user = await db.collection("users").where('uid', '==', data.user_id).get();
-        //   const userResp = user.docs.map(d => d.data())[0];
-
-        //   data['clocking_date_time'] = this.formatDate(data.clocking_date_time.seconds);
-        //   data['name'] = `${userResp.firstname} ${userResp.lastname}`;
-        //   data['clockingPurpose'] = data.clocking_purpose;
-        //   delete data['user_id'];
-        //   return data;
-        // });
-        // result = await Promise.all(result);
-        // if (date) {
-        //   console.log("git here", result.length)
-        //   this.attendance = result;
-        // } else {
-        //   this.attendance.push(...result);
-        // }
         // return result.length;
       },
       async infiniteHandler($state) {
