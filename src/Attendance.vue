@@ -250,8 +250,8 @@
           let csvData = response.data.data;
           csvData = csvData.map(el => {
             return {
-              "FirstName": el.firstname,
-              "LastName": el.lastname,
+              "FirstName": el.user.firstname,
+              "LastName": el.user.lastname,
               "SiteName": el.site_name,
               "ClockingPurpose": el.clocking_purpose,
               "ClockingDateTime": el.clocking_date_time
