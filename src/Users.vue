@@ -89,7 +89,7 @@
     },
     methods: {
 
-      async fetchUsers(start = null, end = null) {
+      async fetchUsers() {
         // let queryDateStart = moment().startOf('day').format('YYYY-MM-DD');
         // let queryDateEnd = moment().endOf('day').format('YYYY-MM-DD');
 
