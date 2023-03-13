@@ -102,7 +102,7 @@
   // import InfiniteLoading from 'vue-infinite-loading'
   import moment from 'moment';
   import axios from 'axios';
-  // import { ExportToCsv } from 'export-to-csv';
+  import { ExportToCsv } from 'export-to-csv';
   // import * as ExcelJS from "exceljs";
   const pageSize = 50;
   // const baseUrl = 'https://sngapp.herokuapp.com/api/v1/';
@@ -112,20 +112,7 @@
     }
   };
 
-  const customStyles = {
 
-    ul: {
-      border: '2px solid red',
-      display: "inline-block"
-    },
-    li: {
-      display: 'inline !important',
-      border: '2px dotted green'
-    },
-    a: {
-      color: 'blue'
-    }
-  };
   export default {
     name: "app",
     watch: {
@@ -149,7 +136,7 @@
         }
       },
       search: async function (val) {
-        const search = val || ""; 
+        const search = val || "";
         this.search = val;
         await this.fetchAttendances(this.startDate, this.endDate, search, 1, pageSize)
       },
@@ -158,7 +145,6 @@
     data() {
       return {
         pager: null,
-        customStyles,
         pickerOptions: {
           disabledDate(time) {
             return time.getTime() > Date.now();
@@ -251,95 +237,83 @@
         return ` ${new Date(date * 1000).toISOString().split("T")[1]}`
       },
       async downloadData() {
-        // let queryDateStart = moment().startOf('day').toDate();
-        // let queryDateEnd = moment().endOf('day').toDate()
-        // console.log("Date Component", this.startDate)
-        // if (this.startDate) {
-        //   queryDateStart = moment(new Date(this.startDate)).startOf('day').toDate();
-        //   queryDateEnd = moment(new Date(this.startDate)).endOf('day').toDate();
-        // }
+        let queryDateStart = moment().startOf('day').format('YYYY-MM-DD');
+        let queryDateEnd = moment().endOf('day').format('YYYY-MM-DD');
 
-        // let attendanceRef = db.collection("attendance")
-        //   .where('clocking_date_time', '>=', queryDateStart)
-        //   .where('clocking_date_time', '<=', queryDateEnd)
-        //   .orderBy("clocking_date_time", "desc");
-        // const attendanceSnap = await attendanceRef.get();
-        // const result = attendanceSnap.docs.map(async (u) => {
-        //   const data = u.data();
-        //   // console.log("issues:", data.user_id)
-        //   const user = await db.collection("users").where('uid', '==', data.user_id).get();
-        //   const userResp = user.docs.map(d => d.data())[0];
+        if (this.startDate) {
+          queryDateStart = moment(new Date(this.startDate))
+            .startOf('day').format('YYYY-MM-DD');
+          queryDateEnd = moment(new Date(this.endDate || this.startDate)).endOf('day').format('YYYY-MM-DD');
+        }
+        try {
+          const response = await axios.get(`clocking/download?startdate=${queryDateStart}&enddate=${queryDateEnd}&search=${this.search}`, config);
+          let csvData = response.data.data;
+          csvData = csvData.map(el => {
+            return {
+              "FirstName": el.firstname,
+              "LastName": el.lastname,
+              "SiteName": el.site_name,
+              "ClockingPurpose": el.clocking_purpose,
+              "ClockingDateTime": el.clocking_date_time
+            }
+          });
+          const options = {
+            fieldSeparator: ',',
+            quoteStrings: '"',
+            decimalSeparator: '.',
+            showLabels: true,
+            showTitle: true,
+            filename: `Attendance for ${queryDateStart}`,
+            title: `Attendance for ${queryDateStart}`,
+            useBom: true,
+            // useKeysAsHeaders: true,
+            headers: ["First Name", "Last Name", "Site Name", "Clocking Purpose", "Clocking Date Time"]
+          };
 
-        //   data['clocking_date_time'] = this.formatDate(data.clocking_date_time.seconds);
-        //   data['firstname'] = userResp.firstname;
-        //   data['lastname'] = userResp.lastname;
-        //   delete data['user_id'];
-        //   return data;
-        // });
+          // const workbook = new ExcelJS.Workbook();
+          // workbook.creator = 'Sng Reports';
+          // workbook.created = new Date();
 
-        // let csvData = await Promise.all(result);
+          // const worksheet = workbook.addWorksheet('Attendance');
+          // 
+          // worksheet.columns = Object.keys(csvData[0] || {}).map(col => ({ key: col, width: 24, height: 10 }));
+          // worksheet.getRow(1).values = ["First Name", "Last Name", "Site Name", "Clocking Purpose", "Clocking Date Time"];
+          // worksheet.getRow(1).height = 85;
+          // worksheet.getRow(1).alignment = { vertical: 'middle' };
+          // worksheet.getRow(1).eachCell((cell) => {
+          //   cell.fill = {
+          //     type: 'pattern',
+          //     pattern: 'darkTrellis',
+          //     fgColor: { argb: '000000' },
+          //     bgColor: { argb: '000000' },
+          //   };
+          //   cell.border = {
+          //     top: { style: 'thick' },
+          //     left: { style: 'thick' },
+          //     bottom: { style: 'thick' },
+          //     right: { style: 'thick' },
+          //   };
+          //   cell.font = {
+          //     color: { argb: 'ffffff' },
+          //     bold: true,
+          //     name: 'Calibri',
+          //   };
+          // });
 
-        // csvData = csvData.map(el => {
-        //   return {
-        //     "FirstName": el.firstname,
-        //     "LastName": el.lastname,
-        //     "SiteName": el.site_name,
-        //     "ClockingPurpose": el.clocking_purpose,
-        //     "ClockingDateTime": el.clocking_date_time
-        //   }
-        // });
-        // console.log("result", csvData.length)
-        // const options = {
-        //   fieldSeparator: ',',
-        //   quoteStrings: '"',
-        //   decimalSeparator: '.',
-        //   showLabels: true,
-        //   showTitle: true,
-        //   filename: `Attendance for ${queryDateStart}`,
-        //   title: `Attendance for ${queryDateStart}`,
-        //   useBom: true,
-        //   // useKeysAsHeaders: true,
-        //   headers: ["First Name", "Last Name", "Site Name", "Clocking Purpose", "Clocking Date Time"]
-        // };
+          // worksheet.addRows(csvData);
+          // worksheet.eachRow((row) => { (row.font || {}).name = 'Calibri'; });
+          //  workbook.xlsx.writeBuffer(`Attendance_for_`).then(data => console.log("data", data));
 
-        // const workbook = new ExcelJS.Workbook();
-        // workbook.creator = 'Sng Reports';
-        // workbook.created = new Date();
+          // return `files/Attendance_for_${queryDateStart}`;
 
-        // const worksheet = workbook.addWorksheet('Attendance');
-        // 
-        // worksheet.columns = Object.keys(csvData[0] || {}).map(col => ({ key: col, width: 24, height: 10 }));
-        // worksheet.getRow(1).values = ["First Name", "Last Name", "Site Name", "Clocking Purpose", "Clocking Date Time"];
-        // worksheet.getRow(1).height = 85;
-        // worksheet.getRow(1).alignment = { vertical: 'middle' };
-        // worksheet.getRow(1).eachCell((cell) => {
-        //   cell.fill = {
-        //     type: 'pattern',
-        //     pattern: 'darkTrellis',
-        //     fgColor: { argb: '000000' },
-        //     bgColor: { argb: '000000' },
-        //   };
-        //   cell.border = {
-        //     top: { style: 'thick' },
-        //     left: { style: 'thick' },
-        //     bottom: { style: 'thick' },
-        //     right: { style: 'thick' },
-        //   };
-        //   cell.font = {
-        //     color: { argb: 'ffffff' },
-        //     bold: true,
-        //     name: 'Calibri',
-        //   };
-        // });
+          const csvExporter = new ExportToCsv(options);
+          csvExporter.generateCsv(csvData);
+        } catch (error) {
+          this.attendance = []
+          console.log(error.message)
+        }
 
-        // worksheet.addRows(csvData);
-        // worksheet.eachRow((row) => { (row.font || {}).name = 'Calibri'; });
-        //  workbook.xlsx.writeBuffer(`Attendance_for_`).then(data => console.log("data", data));
 
-        // return `files/Attendance_for_${queryDateStart}`;
-
-        // const csvExporter = new ExportToCsv(options);
-        // csvExporter.generateCsv(csvData);
       },
 
 
