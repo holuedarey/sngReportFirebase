@@ -35,7 +35,7 @@
 
 <script>
   import InfiniteLoading from 'vue-infinite-loading'
-  import moment from 'moment';
+  // import moment from 'moment';
   import axios from 'axios';
   const pageSize = 50;
   export default {
