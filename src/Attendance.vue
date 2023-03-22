@@ -6,26 +6,27 @@
       <el-col :span="12" :offset="6">
         <div>
           <h1>Attendance</h1>
-          <el-row>
+          <el-row style="margin-bottom: 20px;">
             <el-col :span="18">
-              <!-- <el-date-picker v-model="value2" type="date" placeholder="Pick a date" default-value="">
-              </el-date-picker> -->
+            
               <el-row>
                 <el-col :span="12">
                   <el-date-picker v-model="value1" type="daterange" range-separator="To" start-placeholder="Start date"
                     end-placeholder="End date" :picker-options="pickerOptions">
                   </el-date-picker>
                 </el-col>
-                <el-col :span="12">
-                  <el-form ref="form" :model="form" label-width="">
-                    <el-input v-model="search" placeholder="search with name"></el-input>
-                  </el-form>
-                </el-col>
               </el-row>
 
             </el-col>
-            <el-col :span="5" :offset="0">
+            <el-col :span="5" :offset="1">
               <el-button round type="primary" @click="downloadData()">Download</el-button>
+            </el-col>
+          </el-row>
+          <el-row>
+            <el-col :span="12">
+              <el-form ref="form" :model="form" label-width="">
+                <el-input v-model="search" placeholder="search with name"></el-input>
+              </el-form>
             </el-col>
           </el-row>
           <hr>
