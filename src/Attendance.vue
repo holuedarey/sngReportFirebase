@@ -25,7 +25,7 @@
           <el-row>
             <el-col :span="12">
               <el-form ref="form" :model="form" label-width="">
-                <el-input v-model="search" placeholder="search with name"></el-input>
+                <el-input v-model="search" placeholder="search with name, email or phone number"></el-input>
               </el-form>
             </el-col>
           </el-row>
@@ -97,6 +97,25 @@
     width: 100px;
     text-align: center;
   }
+  ::-webkit-input-placeholder {
+      text-transform: capitalize;
+    }
+
+    :-moz-placeholder {
+      text-transform: capitalize;
+    }
+
+    ::-moz-placeholder {
+      text-transform: capitalize;
+    }
+
+    :-ms-input-placeholder {
+      text-transform: capitalize;
+    }
+
+    input {
+      text-transform: capitalize;
+    }
 </style>
 
 <script>
@@ -198,7 +217,6 @@
     methods: {
 
       async fetchAttendances(start = null, end = null, search = null, page = 1, pageSize) {
-        console.log(start, end)
         let queryDateStart = moment().startOf('day').format('YYYY-MM-DD');
         let queryDateEnd = moment().endOf('day').format('YYYY-MM-DD');
 
@@ -207,9 +225,9 @@
             .startOf('day').format('YYYY-MM-DD');
           queryDateEnd = moment(new Date(end || start)).endOf('day').format('YYYY-MM-DD');
         }
-        console.log(queryDateStart, queryDateEnd)
+
         try {
-          const attendance = await axios.get(`clocking?startdate=${queryDateStart}&enddate=${queryDateEnd}&page=${page}&limit=${pageSize}&search=${search}`, config);
+          const attendance = await axios.get(`clocking?startdate=${queryDateStart}&enddate=${queryDateEnd}&page=${page}&limit=${pageSize}&search=${search == null ? "": this.search }`, config);
           this.attendance = attendance.data.data;
           this.pager = this.attendance['total'];
           this.totalPage = Math.ceil(this.pager / pageSize);
@@ -247,7 +265,7 @@
           queryDateEnd = moment(new Date(this.endDate || this.startDate)).endOf('day').format('YYYY-MM-DD');
         }
         try {
-          const response = await axios.get(`clocking/download?startdate=${queryDateStart}&enddate=${queryDateEnd}&search=${this.search}`, config);
+          const response = await axios.get(`clocking/download?startdate=${queryDateStart}&enddate=${queryDateEnd}&search=${this.search == null ? "": this.search }`, config);
           let csvData = response.data.data;
           csvData = csvData.map(el => {
             return {

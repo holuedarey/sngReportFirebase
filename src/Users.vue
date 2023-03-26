@@ -7,22 +7,18 @@
           <div>
             <h1>Users</h1>
             <hr>
-            <el-table :data="
-                  userData.filter(
-                    (data) =>
-                      !search || data.firstname.toLowerCase().includes(search.toLowerCase())
-                  )
-                " style="width: 100%;">
+            <el-table :data="userData" style="width: 100%;">
               <el-table-column label="#" type="index" width="50"> </el-table-column>
               <el-table-column label="First Name" prop="firstname"> </el-table-column>
               <el-table-column label="Last Name" prop="lastname"> </el-table-column>
-
               <el-table-column label="Email" prop="email"> </el-table-column>
-              <el-table-column align="right">
+              <el-table-column label="Terms and condtion" prop="acceptTerms"></el-table-column>
+
+              <!-- <el-table-column align="right">
                 <template slot="header">
                   <el-input v-model="search" size="mini" placeholder="Type to search" />
                 </template>
-              </el-table-column>
+              </el-table-column> -->
             </el-table>
             <InfiniteLoading @infinite="infiniteHandler"></InfiniteLoading>
           </div>
@@ -106,6 +102,11 @@
           };
           const users = await axios.get(`users?page=${this.page}&limit=${pageSize}&search=${this.search}`, config);
           this.userData = users.data.data;
+          this.userData = this.userData.map(el => {
+            console.log("terms and condition  ", el.acceptTerms )
+            el.acceptTerms =  el.acceptTerms != undefined || el.acceptTerms == true ? "Acdepted": "Pending"
+            return el;
+          })
           // this.pager = this.attendance['total'];
           // this.totalPage = Math.ceil(this.pager / pageSize);
         } catch (error) {
