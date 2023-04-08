@@ -1,30 +1,47 @@
 <template>
   <!-- eslint-disable -->
-  <el-main>
-    <el-row>
-      <el-col :span="12" :offset="6">
-        <div class="grid-content bg-purple">
-          <div>
-            <h1>Users</h1>
-            <hr>
-            <el-table :data="userData" style="width: 100%;">
-              <el-table-column label="#" type="index" width="50"> </el-table-column>
-              <el-table-column label="First Name" prop="firstname"> </el-table-column>
-              <el-table-column label="Last Name" prop="lastname"> </el-table-column>
-              <el-table-column label="Email" prop="email"> </el-table-column>
-              <el-table-column label="Terms and condtion" prop="acceptTerms"></el-table-column>
+  <el-main class="container">
+    <div class="col-md-12">
+      <h1>Users</h1>
+    </div>
 
-              <!-- <el-table-column align="right">
-                <template slot="header">
-                  <el-input v-model="search" size="mini" placeholder="Type to search" />
-                </template>
-              </el-table-column> -->
-            </el-table>
-            <InfiniteLoading @infinite="infiniteHandler"></InfiniteLoading>
-          </div>
-        </div>
-      </el-col>
-    </el-row>
+    <div class="row">
+      <el-skeleton v-if="!userData.length" />
+      <el-table :data="userData" class="table table-striped">
+        <el-table-column label="#" type="index"> </el-table-column>
+        <el-table-column label="First Name" prop="firstname"> </el-table-column>
+        <el-table-column label="Last Name" prop="lastname"> </el-table-column>
+        <el-table-column label="Email" prop="email"> </el-table-column>
+        <el-table-column label="Terms and condtion" prop="acceptTerms"></el-table-column>
+      </el-table>
+    </div>
+      <div class="row">
+      <nav aria-label="Page navigation example"  v-if="userData.length">
+        <ul class="pagination justify-content-center">
+          <li class="page-item">
+            <span v-if="page != totalPage && totalPage != 0">
+              <router-link :to="{ query: { page: 1 }}" class="page-link">First</router-link>
+            </span>
+          </li>
+          <li class="page-item">
+            <span v-if="page !== 1">
+              <router-link :to="{ query: { page: page - 1 }}" class="page-link">Previous</router-link>
+            </span>
+          </li>
+          <li class="page-item">
+            <span v-if="totalPage > page">
+              <router-link :to="{ query: { page: page + 1 }}" class="page-link">Next</router-link>
+            </span>
+          </li>
+          <li class="page-item">
+            <span v-if="page != totalPage">
+              <router-link :to="{ query: { page: totalPage }}" class="page-link">Last</router-link>
+            </span>
+          </li>
+        </ul>
+      </nav>
+    </div>
+    <InfiniteLoading @infinite="infiniteHandler"></InfiniteLoading>
   </el-main>
 
 </template>

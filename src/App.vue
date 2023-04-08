@@ -1,27 +1,30 @@
-<style>
-  body {
-    padding: 0 !important;
-    margin: 0 !important;
-  }
-</style>
 <template>
   <!-- eslint-disable -->
   <div>
-    <el-header style="background-color:#545c64">
-      <el-col :offset="6">
-        <el-menu class="el-menu-demo" mode="horizontal" background-color="#545c64"  text-color="#fff" active-text-color="#ffd04b">
-          <el-menu-item>
-            <router-link to="/">Attendance</router-link>
-          </el-menu-item>
-          <el-menu-item>
-            <router-link to="/users">Users</router-link>
-          </el-menu-item>
-          <el-menu-item>
-            <router-link to="/location">Location</router-link>
-          </el-menu-item>
-        </el-menu>
-      </el-col>
-    </el-header>
+
+    <nav class="navbar navbar-light navbar-expand-lg bg-success sticky-top">
+      <div class="container">
+        <a class="navbar-brand" href="#">
+          <b>South North Group</b>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <el-menu class="navbar-nav me-auto mb-2 mb-lg-0 ml-auto">
+            <el-menu-item class="nav-item">
+              <router-link class="nav-link" to="/">Attendance</router-link>
+            </el-menu-item>
+            <el-menu-item>
+              <router-link class="nav-link" to="/users">Users</router-link>
+            </el-menu-item>
+            <el-menu-item>
+              <router-link class="nav-link" to="/location">Location</router-link>
+            </el-menu-item>
+          </el-menu>
+        </div>
+      </div>
+    </nav>
     <router-view></router-view>
   </div>
 </template>

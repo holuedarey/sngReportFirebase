@@ -1,121 +1,87 @@
 <template>
 
   <!-- eslint-disable -->
-  <el-main style="height: 90vh">
-    <el-row>
-      <el-col :span="12" :offset="6">
-        <div>
-          <h1>Attendance</h1>
-          <el-row style="margin-bottom: 20px;">
-            <el-col :span="18">
-            
-              <el-row>
-                <el-col :span="12">
-                  <el-date-picker v-model="value1" type="daterange" range-separator="To" start-placeholder="Start date"
-                    end-placeholder="End date" :picker-options="pickerOptions">
-                  </el-date-picker>
-                </el-col>
-              </el-row>
-
-            </el-col>
-            <el-col :span="5" :offset="1">
-              <el-button round type="primary" @click="downloadData()">Download</el-button>
-            </el-col>
-          </el-row>
-          <el-row>
-            <el-col :span="12">
-              <el-form ref="form" :model="form" label-width="">
-                <el-input v-model="search" placeholder="search with name, email or phone number"></el-input>
-              </el-form>
-            </el-col>
-          </el-row>
-          <hr>
-          <el-skeleton v-if="!attendance.length" />
-          <el-table :data="attendance" style="width: 100%;">
-            <!-- {{ scope.row.id }} -->
-            <el-table-column label="#" type="index" width="50"> </el-table-column>
-            <el-table-column label="Name" prop="name"> </el-table-column>
-            <el-table-column label="Site Name" prop="site_name"> </el-table-column>
-            <el-table-column label="Clocking Purpose" prop="clocking_purpose"> </el-table-column>
-            <el-table-column label="Clocking Date Time" prop="clocking_date_time"> </el-table-column>
-            <!-- <el-table-column align="right">
-              <template slot="header">
-                <el-input v-model="search" size="mini" placeholder="Type to search" />
-              </template>
-            </el-table-column> -->
-          </el-table>
-          <!-- <InfiniteLoading @infinite="infiniteHandler"></InfiniteLoading> -->
-
-          <el-row>
-            <div class="pagination" v-if="attendance.length">
-              <el-row>
-                <el-col :span="6">
-                  <span v-if="page != totalPage">
-                    <router-link :to="{ query: { page: 1 }}" class="page-link">First</router-link>
-                  </span>
-                </el-col>
-                <el-col :span="6" :offset="6">
-                  <span v-if="page !== 1">
-                    <router-link :to="{ query: { page: page - 1 }}" class="page-link">Previous</router-link>
-                  </span>
-                  <span v-if="totalPage > page">
-                    <router-link :to="{ query: { page: page + 1 }}" class="page-link">Next</router-link>
-                  </span>
-                </el-col>
-                <el-col :span="2" :offset="4">
-                  <span v-if="page != totalPage">
-                    <router-link :to="{ query: { page: totalPage }}" class="page-link">Last</router-link>
-                  </span>
-                </el-col>
-              </el-row>
-
-
-
-            </div>
-          </el-row>
-
-
+  <el-main class="container">
+    <div class="col-md-12">
+      <h1>Attendance</h1>
+      <div class="row">
+        <div class="col-10">
+          <el-date-picker class="col-12" v-model="value1" type="daterange" range-separator="To"
+            start-placeholder="Start date" end-placeholder="End date" :picker-options="pickerOptions">
+          </el-date-picker>
         </div>
-      </el-col>
-    </el-row>
+        <div class="col-2">
+          <el-button round type="primary" @click="downloadData()">Download</el-button>
+        </div>
+      </div>
+      <div class="row mt-3">
+        <div class="col-md-6 col-sm-12 col-xs-12">
+          <el-form ref="form" :model="form" label-width="">
+            <el-input class="form-control" v-model="search" placeholder="search with name, email or phone number">
+            </el-input>
+          </el-form>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <el-skeleton v-if="!attendance.length" />
+      <el-table :data="attendance" class="table table-striped">
+        <el-table-column label="#" type="index" width="50"> </el-table-column>
+        <el-table-column label="Name" prop="name"> </el-table-column>
+        <el-table-column label="Site Name" prop="site_name"> </el-table-column>
+        <el-table-column label="Clocking Purpose" prop="clocking_purpose"> </el-table-column>
+        <el-table-column label="Clocking Date Time" prop="clocking_date_time"> </el-table-column>
+      </el-table>
+    </div>
+    <div class="row">
+      <nav aria-label="Page navigation example"  v-if="attendance.length">
+        <ul class="pagination justify-content-center">
+          <li class="page-item">
+            <span v-if="page != totalPage">
+              <router-link :to="{ query: { page: 1 }}" class="page-link">First</router-link>
+            </span>
+          </li>
+          <li class="page-item">
+            <span v-if="page !== 1">
+              <router-link :to="{ query: { page: page - 1 }}" class="page-link">Previous</router-link>
+            </span>
+          </li>
+          <li class="page-item">
+            <span v-if="totalPage > page">
+              <router-link :to="{ query: { page: page + 1 }}" class="page-link">Next</router-link>
+            </span>
+          </li>
+          <li class="page-item">
+            <span v-if="page != totalPage">
+              <router-link :to="{ query: { page: totalPage }}" class="page-link">Last</router-link>
+            </span>
+          </li>
+        </ul>
+      </nav>
+    </div>
   </el-main>
 </template>
 <style>
-  .pagination {
-    display: inline-block;
-  }
-
-  .pagination a {
-    color: black;
-    float: left;
-    padding: 8px 16px;
-    text-decoration: none;
-    border: 1px solid #efefef;
-    box-shadow: 0px 0px 4px rgba(110, 110, 110, 0.6);
-    padding: 10px;
-    margin: 20px;
-    width: 100px;
-    text-align: center;
-  }
   ::-webkit-input-placeholder {
-      text-transform: capitalize;
-    }
+    text-transform: capitalize;
+  }
 
-    :-moz-placeholder {
-      text-transform: capitalize;
-    }
+  :-moz-placeholder {
+    text-transform: capitalize;
+  }
 
-    ::-moz-placeholder {
-      text-transform: capitalize;
-    }
+  ::-moz-placeholder {
+    text-transform: capitalize;
+  }
 
-    :-ms-input-placeholder {
-      text-transform: capitalize;
-    }
+  :-ms-input-placeholder {
+    text-transform: capitalize;
+  }
 
-    input {
-      text-transform: capitalize;
-    }
+  input {
+    text-transform: capitalize;
+  }
 </style>
 
 <script>
@@ -227,7 +193,7 @@
         }
 
         try {
-          const attendance = await axios.get(`clocking?startdate=${queryDateStart}&enddate=${queryDateEnd}&page=${page}&limit=${pageSize}&search=${search == null ? "": this.search }`, config);
+          const attendance = await axios.get(`clocking?startdate=${queryDateStart}&enddate=${queryDateEnd}&page=${page}&limit=${pageSize}&search=${search == null ? "" : this.search}`, config);
           this.attendance = attendance.data.data;
           this.pager = this.attendance['total'];
           this.totalPage = Math.ceil(this.pager / pageSize);
@@ -265,7 +231,7 @@
           queryDateEnd = moment(new Date(this.endDate || this.startDate)).endOf('day').format('YYYY-MM-DD');
         }
         try {
-          const response = await axios.get(`clocking/download?startdate=${queryDateStart}&enddate=${queryDateEnd}&search=${this.search == null ? "": this.search }`, config);
+          const response = await axios.get(`clocking/download?startdate=${queryDateStart}&enddate=${queryDateEnd}&search=${this.search == null ? "" : this.search}`, config);
           let csvData = response.data.data;
           csvData = csvData.map(el => {
             return {
