@@ -120,7 +120,7 @@
           this.totalPage = totalPage;
           console.log("page", page, 'totalPage', totalPage, this.pager);
           if (totalPage >= page) {
-            await this.fetchAttendances(this.startDate, this.endDate, this.search, page, pageSize)
+            await this.location()
           }
         }
       },
@@ -219,7 +219,7 @@
           console.log("modal click", this.form.name)
 
           // config.body = payload;
-          const location = await axios.patch(`${baseUrl}location/update`, payload, config);
+          const location = await axios.patch(`${baseUrl}location/update/${item._id}`, payload, config);
           console.log("savedobject ::", location);
           this.form.name = ""
           await this.location();
@@ -228,25 +228,19 @@
           console.log(error.message)
         }
       },
-      async deleteLocation() {
-        this.dialogFormVisibleDel = true;
-        const payload = {
-          name: this.form.name,
+      async deleteLocation(item) {
+        this.dialogFormVisibleDel = false;
+       
+        try {
+           // config.body = payload;
+          const location = await axios.delete(`${baseUrl}location/delete/${item._id}`, config);
+          console.log("savedobject ::", location);
+          this.form.name = ""
+          await this.location();
+        } catch (error) {
+          this.form.name = ""
+          console.log(error.message)
         }
-        setTimeout(() => this.dialogFormVisibleDel = false, 5000)
-        // this.dialogFormVisibleDel = false;
-
-        return payload;
-        // try {
-        //    // config.body = payload;
-        //   const location = await axios.patch(`${baseUrl}location/update`, payload, config);
-        //   console.log("savedobject ::", location);
-        //   this.form.name = ""
-        //   await this.location();
-        // } catch (error) {
-        //   this.form.name = ""
-        //   console.log(error.message)
-        // }
       },
     },
   }
