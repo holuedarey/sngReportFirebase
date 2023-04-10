@@ -7,13 +7,26 @@
 
     <div class="row">
       <el-skeleton v-if="!userData.length" />
-      <el-table :data="userData" class="table table-striped">
-        <el-table-column label="#" type="index"> </el-table-column>
-        <el-table-column label="First Name" prop="firstname"> </el-table-column>
-        <el-table-column label="Last Name" prop="lastname"> </el-table-column>
-        <el-table-column label="Email" prop="email"> </el-table-column>
-        <el-table-column label="Terms and condtion" prop="acceptTerms"></el-table-column>
-      </el-table>
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">First Name</th>
+            <th scope="col">Last Name</th>
+            <th scope="col">Email</th>
+            <th scope="col">Terms and condtion</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(item, index) in userData">
+            <th scope="row">{{index + 1}}</th>
+            <td style="text-transform: capitalize;">{{ item.firstname}}</td>
+            <td>{{item.lastname}}</td>
+            <td>{{item.email}}</td>
+            <td>{{item.acceptTerms}}</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
       <div class="row">
       <nav aria-label="Page navigation example"  v-if="userData.length">

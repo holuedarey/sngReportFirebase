@@ -11,7 +11,7 @@
     </div>
 
     <div class="row">
-      <el-table :data="locationData" class="table table-stripped">
+      <!-- <el-table :data="locationData" class="table table-stripped">
         <el-table-column label="#" type="index"> </el-table-column>
         <el-table-column label="Site Name" prop="name"> </el-table-column>
         <el-table-column class="justify-content-right" label="Action">
@@ -20,7 +20,27 @@
             <el-button type="danger" circle icon="el-icon-delete" @click="editLocation(scope.$index)"></el-button>
           </template>
         </el-table-column>
-      </el-table>
+      </el-table> -->
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Site Name</th>
+            <th scope="col">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(item, index) in locationData">
+            <th scope="row">{{index + 1}}</th>
+            <td>{{item.name}}</td>
+
+            <td>
+              <el-button type="info" circle icon="el-icon-edit" @click="editLocation(item)"></el-button>
+              <el-button type="danger" circle icon="el-icon-delete" @click="deleteLocation(item)"></el-button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
       <InfiniteLoading @infinite="infiniteHandler"></InfiniteLoading>
 
       <el-dialog title="Add Location" :visible.sync="dialogFormVisible">
@@ -44,8 +64,17 @@
           </el-form-item>
         </el-form>
         <div class="row">
-          <el-button class="col" @click="dialogFormVisible = false">Cancel</el-button>
+          <el-button class="col" @click="dialogFormVisibleEdit = false">Cancel</el-button>
           <el-button class="col" type="primary" @click="updateLocation()">Update</el-button>
+        </div>
+      </el-dialog>
+
+      <el-dialog title="Delete Location" :visible.sync="dialogFormVisibleDel">
+        <p class="justify-content-center text-center">Are you sure you want to delete?</p>
+        <br>
+        <div class="row">
+          <el-button class="col" @click="dialogFormVisibleDel = false">Cancel</el-button>
+          <el-button class="col" type="danger" @click="deleteLocation()">Delete</el-button>
         </div>
       </el-dialog>
     </div>
@@ -69,6 +98,7 @@
         dialogVisible: false,
         dialogFormVisible: false,
         dialogFormVisibleEdit: false,
+        dialogFormVisibleDel: false,
         editName: '',
         formLabelWidth: '120px',
         form: {
@@ -118,9 +148,10 @@
         return $state.complete();
       },
       async editLocation(index) {
+        console.log("incoming data", index)
         // this.form.name = name;
         this.dialogFormVisibleEdit = true;
-        this.form.nameEdit = this.locationData[index].name;
+        this.form.nameEdit = index.name;
       },
       async addLocation() {
         this.dialogFormVisible = false;
@@ -141,7 +172,7 @@
         }
       },
       async updateLocation() {
-        this.dialogFormVisible = false;
+        this.dialogFormVisibleEdit = false;
         const payload = {
           name: this.form.name,
         }
@@ -157,6 +188,26 @@
           this.form.name = ""
           console.log(error.message)
         }
+      },
+      async deleteLocation() {
+        this.dialogFormVisibleDel = true;
+        const payload = {
+          name: this.form.name,
+        }
+        setTimeout(()=> this.dialogFormVisibleDel = false, 5000)
+        // this.dialogFormVisibleDel = false;
+
+        return payload;
+        // try {
+        //    // config.body = payload;
+        //   const location = await axios.patch(`${baseUrl}location/update`, payload, config);
+        //   console.log("savedobject ::", location);
+        //   this.form.name = ""
+        //   await this.location();
+        // } catch (error) {
+        //   this.form.name = ""
+        //   console.log(error.message)
+        // }
       },
     },
   }

@@ -5,12 +5,12 @@
     <div class="col-md-12">
       <h1>Attendance</h1>
       <div class="row">
-        <div class="col-10">
+        <div class="col-md-10 col-sm-12 col-xs-12 mb-3">
           <el-date-picker class="col-12" v-model="value1" type="daterange" range-separator="To"
             start-placeholder="Start date" end-placeholder="End date" :picker-options="pickerOptions">
           </el-date-picker>
         </div>
-        <div class="col-2">
+        <div class="col-md-2 col-xs-12 col-sm-12">
           <el-button round type="primary" @click="downloadData()">Download</el-button>
         </div>
       </div>
@@ -23,19 +23,30 @@
         </div>
       </div>
     </div>
-
     <div class="row">
-      <el-skeleton v-if="!attendance.length" />
-      <el-table :data="attendance" class="table table-striped">
-        <el-table-column label="#" type="index" width="50"> </el-table-column>
-        <el-table-column label="Name" prop="name"> </el-table-column>
-        <el-table-column label="Site Name" prop="site_name"> </el-table-column>
-        <el-table-column label="Clocking Purpose" prop="clocking_purpose"> </el-table-column>
-        <el-table-column label="Clocking Date Time" prop="clocking_date_time"> </el-table-column>
-      </el-table>
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Name</th>
+            <th scope="col">Site Name</th>
+            <th scope="col">Clocking Purpose</th>
+            <th scope="col">Clocking Date Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(item, index) in attendance">
+            <th scope="row">{{index + 1}}</th>
+            <td style="text-transform: capitalize;">{{ item.name}}</td>
+            <td>{{item.site_name}}</td>
+            <td>{{item.clocking_purpose}}</td>
+            <td>{{item.clocking_date_time}}</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
     <div class="row">
-      <nav aria-label="Page navigation example"  v-if="attendance.length">
+      <nav aria-label="Page navigation example" v-if="attendance.length">
         <ul class="pagination justify-content-center">
           <li class="page-item">
             <span v-if="page != totalPage">
@@ -53,7 +64,7 @@
             </span>
           </li>
           <li class="page-item">
-            <span v-if="page != totalPage">
+            <span v-if="page != totalPage && totalPage != 0">
               <router-link :to="{ query: { page: totalPage }}" class="page-link">Last</router-link>
             </span>
           </li>
