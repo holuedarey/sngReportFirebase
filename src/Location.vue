@@ -64,7 +64,7 @@
         <br>
         <div class="row">
           <el-button class="col" @click="dialogFormVisibleDel = false">Cancel</el-button>
-          <el-button class="col" type="danger" @click="deleteLocation()">Delete</el-button>
+          <el-button class="col" type="danger" @click="deleteStatus = true">Delete</el-button>
         </div>
       </el-dialog>
     </div>
@@ -141,7 +141,7 @@
           name: "",
           nameEdit: ""
         },
-        EditItem:null
+        EditItem:null,
       };
     },
     components: {
@@ -231,13 +231,15 @@
         }
       },
       async deleteLocation(item) {
-        this.dialogFormVisibleDel = false;
+        this.dialogFormVisibleDel = true;
        
         try {
            // config.body = payload;
           const location = await axios.delete(`${baseUrl}location/delete/${item._id}`, config);
           console.log("savedobject ::", location);
-          this.form.name = ""
+          this.form.name = "";
+        this.dialogFormVisibleDel = false;
+
           await this.location();
         } catch (error) {
           this.form.name = ""
