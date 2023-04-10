@@ -54,7 +54,7 @@
           </el-form-item>
         </el-form>
         <div class="row">
-          <el-button class="col" @click="dialogFormVisibleEdit = false">Cancel</el-button>
+          <el-button class="col" @click="dialogFormVisibleEdit = false; this.EditItem =null;">Cancel</el-button>
           <el-button class="col" type="primary" @click="updateLocation()">Update</el-button>
         </div>
       </el-dialog>
@@ -140,7 +140,8 @@
         form: {
           name: "",
           nameEdit: ""
-        }
+        },
+        EditItem:null
       };
     },
     components: {
@@ -191,6 +192,7 @@
         // this.form.name = name;
         this.dialogFormVisibleEdit = true;
         this.form.nameEdit = index.name;
+        this.EditItem = index;
       },
       async addLocation() {
         this.dialogFormVisible = false;
@@ -219,7 +221,7 @@
           console.log("modal click", this.form.name)
 
           // config.body = payload;
-          const location = await axios.patch(`${baseUrl}location/update/${item._id}`, payload, config);
+          const location = await axios.patch(`${baseUrl}location/update/${this.EditItem._id}`, payload, config);
           console.log("savedobject ::", location);
           this.form.name = ""
           await this.location();
