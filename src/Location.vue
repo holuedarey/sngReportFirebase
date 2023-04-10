@@ -11,16 +11,6 @@
     </div>
 
     <div class="row">
-      <!-- <el-table :data="locationData" class="table table-stripped">
-        <el-table-column label="#" type="index"> </el-table-column>
-        <el-table-column label="Site Name" prop="name"> </el-table-column>
-        <el-table-column class="justify-content-right" label="Action">
-          <template slot-scope="scope">
-            <el-button type="info" circle icon="el-icon-edit" @click="editLocation(scope.$index)"></el-button>
-            <el-button type="danger" circle icon="el-icon-delete" @click="editLocation(scope.$index)"></el-button>
-          </template>
-        </el-table-column>
-      </el-table> -->
       <table class="table">
         <thead>
           <tr>
@@ -78,6 +68,32 @@
         </div>
       </el-dialog>
     </div>
+    <div class="row">
+      <nav aria-label="Page navigation example" v-if="locationData.length">
+        <ul class="pagination justify-content-center">
+          <li class="page-item">
+            <span v-if="page != totalPage">
+              <router-link :to="{ query: { page: 1 }}" class="page-link">First</router-link>
+            </span>
+          </li>
+          <li class="page-item">
+            <span v-if="page !== 1">
+              <router-link :to="{ query: { page: page - 1 }}" class="page-link">Previous</router-link>
+            </span>
+          </li>
+          <li class="page-item">
+            <span v-if="totalPage > page">
+              <router-link :to="{ query: { page: page + 1 }}" class="page-link">Next</router-link>
+            </span>
+          </li>
+          <li class="page-item">
+            <span v-if="page != totalPage && totalPage != 0">
+              <router-link :to="{ query: { page: totalPage }}" class="page-link">Last</router-link>
+            </span>
+          </li>
+        </ul>
+      </nav>
+    </div>
   </el-main>
 
 </template>
@@ -85,6 +101,8 @@
   const baseUrl = 'https://sngapp.herokuapp.com/api/v1/';
   import InfiniteLoading from 'vue-infinite-loading'
   import axios from 'axios';
+
+  const pageSize = 30;
   let config = {
     headers: {
       authorization: 'Bearer j38yo87hyedb67y8ypgedt6798390u87gsghsa989d7go8d',
@@ -92,6 +110,21 @@
   };
   export default {
     name: "app",
+    watch: {
+      '$route.query.page': {
+        immediate: true,
+        async handler(page) {
+          page = parseInt(page) || 1;
+          this.page = page;
+          const totalPage = Math.ceil(this.pager / pageSize);
+          this.totalPage = totalPage;
+          console.log("page", page, 'totalPage', totalPage, this.pager);
+          if (totalPage >= page) {
+            await this.fetchAttendances(this.startDate, this.endDate, this.search, page, pageSize)
+          }
+        }
+      },
+    },
     data() {
       return {
         locationData: [],
@@ -101,6 +134,9 @@
         dialogFormVisibleDel: false,
         editName: '',
         formLabelWidth: '120px',
+        page: 1,
+        totalPage: null,
+        pager: null,
         form: {
           name: "",
           nameEdit: ""
@@ -122,8 +158,11 @@
       },
       async location() {
         try {
-          const location = await axios.get(`${baseUrl}location`, config);
+          const location = await axios.get(`${baseUrl}location?page=${this.page}&limit=${pageSize}`, config);
           this.locationData = location.data.data;
+          this.pager = this.locationData['total'];
+          this.totalPage = Math.ceil(this.pager / pageSize);
+          this.locationData = location.data.data['row'];
         } catch (error) {
           this.locationData = []
           console.log(error.message)
@@ -194,7 +233,7 @@
         const payload = {
           name: this.form.name,
         }
-        setTimeout(()=> this.dialogFormVisibleDel = false, 5000)
+        setTimeout(() => this.dialogFormVisibleDel = false, 5000)
         // this.dialogFormVisibleDel = false;
 
         return payload;
